@@ -113,8 +113,13 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
 
   if (!contact) {
     return (
-      <div className="flex h-full w-70 items-center justify-center border-l border-slate-800 bg-slate-900">
-        <p className="text-sm text-slate-500">Select a conversation</p>
+      <div className="hidden w-72 flex-col border-l border-slate-800 bg-slate-900 lg:flex">
+        <div className="flex flex-1 flex-col items-center justify-center p-4 text-center">
+          <User className="h-8 w-8 text-slate-600" />
+          <p className="mt-2 text-xs text-slate-500">
+            Selecione um contato para ver os detalhes
+          </p>
+        </div>
       </div>
     );
   }
@@ -123,10 +128,10 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
   const initials = displayName.charAt(0).toUpperCase();
 
   return (
-    <div className="flex h-full w-70 flex-col border-l border-slate-800 bg-slate-900">
+    <div className="hidden w-72 flex-col border-l border-slate-800 bg-slate-900 lg:flex">
       <ScrollArea className="flex-1">
         <div className="p-4">
-          {/* Contact Info */}
+          {/* Avatar + Name */}
           <div className="flex flex-col items-center text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-700 text-lg font-semibold text-white">
               {contact.avatar_url ? (
@@ -177,11 +182,11 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
           <div>
             <div className="flex items-center gap-2 px-1 text-xs font-medium uppercase tracking-wider text-slate-500">
               <TagIcon className="h-3 w-3" />
-              Tags
+              Etiquetas (Tags)
             </div>
             <div className="mt-2 flex flex-wrap gap-1">
               {tags.length === 0 ? (
-                <p className="px-1 text-xs text-slate-600">No tags</p>
+                <p className="px-1 text-xs text-slate-600">Sem etiquetas</p>
               ) : (
                 tags.map((tag) => (
                   <span
@@ -206,11 +211,11 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
           <div>
             <div className="flex items-center gap-2 px-1 text-xs font-medium uppercase tracking-wider text-slate-500">
               <DollarSign className="h-3 w-3" />
-              Active Deals
+              Oportunidades Ativas
             </div>
             <div className="mt-2 space-y-2">
               {deals.length === 0 ? (
-                <p className="px-1 text-xs text-slate-600">No deals</p>
+                <p className="px-1 text-xs text-slate-600">Sem oportunidades</p>
               ) : (
                 deals.map((deal) => (
                   <div
@@ -222,8 +227,7 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
                     </p>
                     <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
                       <span>
-                        {deal.currency ?? "$"}
-                        {deal.value.toLocaleString()}
+                        R$ {deal.value.toLocaleString("pt-BR")}
                       </span>
                       {deal.stage && (
                         <span
@@ -250,14 +254,14 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
           <div>
             <div className="flex items-center gap-2 px-1 text-xs font-medium uppercase tracking-wider text-slate-500">
               <StickyNote className="h-3 w-3" />
-              Notes
+              Notas Internas
             </div>
             <div className="mt-2">
               <div className="flex gap-2">
                 <textarea
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
-                  placeholder="Add a note..."
+                  placeholder="Adicionar uma nota..."
                   rows={2}
                   className="flex-1 resize-none rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-violet-500/50"
                 />
@@ -281,7 +285,7 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
                       {note.note_text}
                     </p>
                     <p className="mt-1 text-[10px] text-slate-600">
-                      {format(new Date(note.created_at), "MMM d, yyyy HH:mm")}
+                      {format(new Date(note.created_at), "dd/MM/yyyy HH:mm")}
                     </p>
                   </div>
                 ))}

@@ -202,7 +202,7 @@ export function ProfileForm() {
       removeAvatar);
 
   const joined = user?.created_at
-    ? new Date(user.created_at).toLocaleDateString(undefined, {
+    ? new Date(user.created_at).toLocaleDateString('pt-BR', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -212,10 +212,9 @@ export function ProfileForm() {
   return (
     <Card className="bg-slate-900/40 border-slate-800">
       <CardHeader>
-        <CardTitle className="text-white">Profile</CardTitle>
+        <CardTitle className="text-white">Perfil</CardTitle>
         <CardDescription className="text-slate-400">
-          How you show up across the app. Your avatar and name appear in the
-          header, sidebar, and anywhere your teammates see you.
+          Como você aparece no aplicativo. Sua foto e nome são exibidos no cabeçalho, barra lateral e para os membros da sua equipe.
         </CardDescription>
       </CardHeader>
 
@@ -245,9 +244,10 @@ export function ProfileForm() {
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={saving}
+                className="border-slate-700 text-slate-300 hover:bg-slate-800"
               >
                 <Upload className="size-4" />
-                {currentAvatar ? 'Change photo' : 'Upload photo'}
+                {currentAvatar ? 'Alterar foto' : 'Enviar foto'}
               </Button>
               {currentAvatar && (
                 <Button
@@ -258,11 +258,11 @@ export function ProfileForm() {
                   className="text-slate-400 hover:text-white"
                 >
                   <Trash2 className="size-4" />
-                  Remove
+                  Remover
                 </Button>
               )}
               <p className="w-full text-xs text-slate-500">
-                PNG, JPG, WebP, or GIF. Up to 2 MB.
+                PNG, JPG, WebP ou GIF. Até 2 MB.
               </p>
             </div>
           </div>
@@ -270,7 +270,7 @@ export function ProfileForm() {
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="profile-full-name" className="text-slate-200">
-              Display name
+              Nome de exibição
             </Label>
             <Input
               id="profile-full-name"
@@ -280,13 +280,14 @@ export function ProfileForm() {
               maxLength={120}
               disabled={saving}
               required
+              className="bg-slate-800 border-slate-700 text-white"
             />
           </div>
 
           {/* Email */}
           <div className="space-y-2">
             <Label htmlFor="profile-email" className="text-slate-200">
-              Email
+              E-mail
             </Label>
             <Input
               id="profile-email"
@@ -295,14 +296,14 @@ export function ProfileForm() {
               onChange={(e) => setEmail(e.target.value)}
               disabled={saving}
               required
+              className="bg-slate-800 border-slate-700 text-white"
             />
             {emailChangePending && (
               <p className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-300">
                 <Mail className="mt-0.5 size-3.5 shrink-0" />
                 <span>
-                  Check the inbox for <strong>{profile?.email}</strong> and{' '}
-                  <strong>{email}</strong> — both need to confirm before the
-                  change takes effect.
+                  Verifique a caixa de entrada de <strong>{profile?.email}</strong> e{' '}
+                  <strong>{email}</strong> — ambos precisam confirmar a alteração.
                 </span>
               </p>
             )}
@@ -311,21 +312,21 @@ export function ProfileForm() {
           {/* Read-only block */}
           <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Account details
+              Detalhes da conta
             </p>
             <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-slate-500">Role</dt>
+                <dt className="text-slate-500">Função (Role)</dt>
                 <dd className="mt-0.5 font-mono text-slate-200">
-                  {profile?.role ?? 'user'}
+                  {profile?.role ?? 'usuário'}
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-500">Joined</dt>
+                <dt className="text-slate-500">Cadastrado em</dt>
                 <dd className="mt-0.5 text-slate-200">{joined}</dd>
               </div>
               <div className="sm:col-span-2">
-                <dt className="text-slate-500">User ID</dt>
+                <dt className="text-slate-500">ID do Usuário</dt>
                 <dd className="mt-0.5 break-all font-mono text-xs text-slate-400">
                   {user?.id ?? '—'}
                 </dd>
@@ -336,19 +337,23 @@ export function ProfileForm() {
           {!profile && (
             <p className="flex items-center gap-2 text-sm text-slate-400">
               <CircleAlert className="size-4" />
-              Loading your profile…
+              Carregando seu perfil…
             </p>
           )}
 
           <div className="flex justify-end">
-            <Button type="submit" disabled={saving || !dirty || !profile}>
+            <Button
+              type="submit"
+              disabled={saving || !dirty || !profile}
+              className="bg-violet-600 hover:bg-violet-700 text-white"
+            >
               {saving ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Saving…
+                  Salvando…
                 </>
               ) : (
-                'Save changes'
+                'Salvar alterações'
               )}
             </Button>
           </div>

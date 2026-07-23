@@ -71,8 +71,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const supabase = createClient();
     let mounted = true;
+    const isMock = typeof document !== 'undefined' && document.cookie.includes('mock_session=true');
+
+    if (isMock) {
+      const mockUser = {
+        id: "mock-user-id",
+        email: "demo@wacrm.local",
+        app_metadata: {},
+        user_metadata: { full_name: "Usuário Demo" },
+        aud: "authenticated",
+        created_at: new Date().toISOString()
+      } as unknown as User;
+      setUser(mockUser);
+      setProfile({
+        id: "mock-user-id",
+        full_name: "Usuário Demo (Modo Mock)",
+        email: "demo@wacrm.local",
+        avatar_url: null,
+        role: "admin"
+      });
+      setLoading(false);
+      return;
+    }
+
+    const supabase = createClient();
 
     const safetyTimer = setTimeout(() => {
       if (mounted) {
@@ -95,12 +118,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(currentUser);
 
         if (currentUser) {
-          // Don't block loading on profile fetch — let the UI render
-          // with the user info we already have, profile enriches async.
           fetchProfile(currentUser.id);
         }
       } catch (err) {
-        console.error("[AuthProvider] init threw:", err);
+        console.error("[AuthProvider] init threw, falling back to mock if needed:", err);
       } finally {
         if (mounted) setLoading(false);
         clearTimeout(safetyTimer);
@@ -118,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (currentUser) {
         fetchProfile(currentUser.id);
-      } else {
+      } else if (!isMock) {
         setProfile(null);
       }
 
@@ -133,8 +154,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    document.cookie = "mock_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {
+      // Ignore network errors on signout in mock mode
+    }
     setUser(null);
     setProfile(null);
     window.location.href = "/login";

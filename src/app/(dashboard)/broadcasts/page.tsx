@@ -176,9 +176,9 @@ export default function BroadcastsPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Broadcasts</h1>
+          <h1 className="text-2xl font-bold text-white">Disparos em Massa</h1>
           <p className="mt-1 text-sm text-slate-400">
-            Send bulk messages to your contacts using approved templates.
+            Envie mensagens em lote para seus contatos usando modelos de mensagem (templates) aprovados.
           </p>
         </div>
         <Button
@@ -186,23 +186,23 @@ export default function BroadcastsPage() {
           className="bg-violet-600 text-white hover:bg-violet-700"
         >
           <Plus className="h-4 w-4" />
-          New Broadcast
+          Novo Disparo
         </Button>
       </div>
 
       {broadcasts.length === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-slate-800 bg-slate-900">
           <Radio className="mb-3 h-10 w-10 text-slate-600" />
-          <p className="text-sm font-medium text-white">No broadcasts yet</p>
+          <p className="text-sm font-medium text-white">Nenhum disparo realizado ainda</p>
           <p className="mt-1 text-xs text-slate-400">
-            Create your first broadcast to reach your contacts at scale.
+            Crie seu primeiro disparo em massa para alcançar seus contatos em escala.
           </p>
           <Button
             onClick={() => router.push('/broadcasts/new')}
             className="mt-4 bg-violet-600 text-white hover:bg-violet-700"
           >
             <Plus className="h-4 w-4" />
-            New Broadcast
+            Novo Disparo
           </Button>
         </div>
       ) : (
@@ -210,15 +210,15 @@ export default function BroadcastsPage() {
           <Table>
             <TableHeader>
               <TableRow className="border-slate-800 hover:bg-transparent">
-                <TableHead className="text-slate-400">Name</TableHead>
-                <TableHead className="hidden text-slate-400 md:table-cell">Template</TableHead>
+                <TableHead className="text-slate-400">Nome</TableHead>
+                <TableHead className="hidden text-slate-400 md:table-cell">Modelo (Template)</TableHead>
                 <TableHead className="hidden text-right text-slate-400 sm:table-cell">
-                  Recipients
+                  Destinatários
                 </TableHead>
-                <TableHead className="hidden text-slate-400 lg:table-cell">Delivery</TableHead>
-                <TableHead className="hidden text-slate-400 lg:table-cell">Read</TableHead>
+                <TableHead className="hidden text-slate-400 lg:table-cell">Entregues</TableHead>
+                <TableHead className="hidden text-slate-400 lg:table-cell">Lidos</TableHead>
                 <TableHead className="text-slate-400">Status</TableHead>
-                <TableHead className="hidden text-slate-400 sm:table-cell">Date</TableHead>
+                <TableHead className="hidden text-slate-400 sm:table-cell">Data</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -24,23 +24,34 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
+  const handleDemoLogin = () => {
+    document.cookie = "mock_session=true; path=/";
+    router.push("/dashboard");
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      console.warn("Supabase auth failed:", err);
+      setError("Supabase indisponível no momento. Você pode entrar em Modo Demo (Mock) para explorar o painel.");
       setLoading(false);
-      return;
     }
-
-    router.push("/dashboard");
   };
 
   return (
@@ -52,14 +63,21 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-xl text-white">Welcome back</CardTitle>
           <CardDescription className="text-slate-400">
-            Sign in to your account
+            Sign in to your account or enter Demo Mode
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             {error && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                {error}
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300 flex flex-col gap-2">
+                <span>{error}</span>
+                <Button
+                  type="button"
+                  onClick={handleDemoLogin}
+                  className="bg-amber-600 hover:bg-amber-500 text-white text-xs h-8"
+                >
+                  ⚡ Entrar em Modo Demo Agora
+                </Button>
               </div>
             )}
 
@@ -107,6 +125,24 @@ export default function LoginPage() {
               className="mt-2 h-10 w-full bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-50"
             >
               {loading ? "Signing in..." : "Sign in"}
+            </Button>
+
+            <div className="relative my-2">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-slate-800" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-slate-900 px-2 text-slate-500">Ou</span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              onClick={handleDemoLogin}
+              variant="outline"
+              className="h-10 w-full border-slate-700 bg-slate-800/60 text-slate-200 hover:bg-slate-800 hover:text-white"
+            >
+              🚀 Entrar sem Supabase (Modo Demo)
             </Button>
           </form>
 

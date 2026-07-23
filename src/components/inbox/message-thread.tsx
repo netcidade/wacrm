@@ -22,6 +22,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { format, isToday, isYesterday, differenceInHours } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -74,9 +75,9 @@ interface MessageThreadProps {
 
 function formatDateSeparator(dateStr: string): string {
   const date = new Date(dateStr);
-  if (isToday(date)) return "Today";
-  if (isYesterday(date)) return "Yesterday";
-  return format(date, "MMMM d, yyyy");
+  if (isToday(date)) return "Hoje";
+  if (isYesterday(date)) return "Ontem";
+  return format(date, "d 'de' MMMM 'de' yyyy", { locale: ptBR });
 }
 
 function groupMessagesByDate(messages: Message[]) {
@@ -97,9 +98,9 @@ function groupMessagesByDate(messages: Message[]) {
 }
 
 const STATUS_OPTIONS: { label: string; value: ConversationStatus; color: string }[] = [
-  { label: "Open", value: "open", color: "text-violet-400" },
-  { label: "Pending", value: "pending", color: "text-amber-400" },
-  { label: "Closed", value: "closed", color: "text-slate-400" },
+  { label: "Aberto", value: "open", color: "text-violet-400" },
+  { label: "Pendente", value: "pending", color: "text-amber-400" },
+  { label: "Fechado", value: "closed", color: "text-slate-400" },
 ];
 
 export function MessageThread({
@@ -613,10 +614,10 @@ export function MessageThread({
           <MessageSquare className="h-8 w-8 text-slate-600" />
         </div>
         <h3 className="mt-4 text-sm font-medium text-slate-400">
-          Select a conversation
+          Selecione uma conversa
         </h3>
         <p className="mt-1 text-xs text-slate-600">
-          Choose a conversation from the left to start messaging
+          Escolha uma conversa na lista à esquerda para iniciar o atendimento
         </p>
       </div>
     );
@@ -630,21 +631,19 @@ export function MessageThread({
   const assignedAgentId = conversation.assigned_agent_id ?? null;
   const currentAssignee = profiles.find((p) => p.user_id === assignedAgentId);
   const assignLabel = assignedAgentId
-    ? (currentAssignee?.full_name ?? "Assigned")
-    : "Assign";
+    ? (currentAssignee?.full_name ?? "Atribuído")
+    : "Atribuir";
 
   return (
     <div className="flex flex-1 flex-col bg-slate-950">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 border-b border-slate-800 bg-slate-900 px-3 py-3 sm:px-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          {/* Back-to-list button — mobile only. Hidden on lg+ where the
-              conversation list is always visible next to the thread. */}
           {onBack && (
             <button
               type="button"
               onClick={onBack}
-              aria-label="Back to conversations"
+              aria-label="Voltar para conversas"
               className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md text-slate-300 hover:bg-slate-800 hover:text-white lg:hidden"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -657,8 +656,6 @@ export function MessageThread({
             <h2 className="truncate text-sm font-semibold text-white">{displayName}</h2>
             <p className="truncate text-xs text-slate-400">{contact.phone}</p>
           </div>
-          {/* Session timer badge — hidden on the narrowest phones so
-              the name + back arrow keep their room. */}
           <Badge
             variant="outline"
             className={cn(
@@ -715,7 +712,7 @@ export function MessageThread({
             >
               {profiles.length === 0 ? (
                 <DropdownMenuItem disabled className="text-sm text-slate-500">
-                  No teammates available
+                  Nenhum atendente disponível
                 </DropdownMenuItem>
               ) : (
                 profiles.map((p) => {
@@ -731,7 +728,7 @@ export function MessageThread({
                     >
                       <span className="flex-1">
                         {p.full_name}
-                        {p.user_id === user?.id ? " (me)" : ""}
+                        {p.user_id === user?.id ? " (eu)" : ""}
                       </span>
                       {isSelected && <Check className="ml-2 h-3 w-3" />}
                     </DropdownMenuItem>
@@ -745,7 +742,7 @@ export function MessageThread({
                     onClick={() => handleAssignChange(null)}
                     className="text-sm text-slate-400"
                   >
-                    Unassign
+                    Desatribuir
                   </DropdownMenuItem>
                 </>
               )}

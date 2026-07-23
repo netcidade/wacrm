@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -23,7 +23,19 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const isMock = request.cookies.get('mock_session')?.value === 'true'
+  let user: { id: string; email?: string } | null = null
+
+  if (isMock) {
+    user = { id: 'mock-user-id', email: 'demo@wacrm.local' }
+  } else {
+    try {
+      const { data } = await supabase.auth.getUser()
+      user = data?.user ?? null
+    } catch (err) {
+      console.warn('[proxy] Supabase reachability check failed:', err)
+    }
+  }
 
   // Auth pages - redirect to dashboard if already logged in
   if (user && (

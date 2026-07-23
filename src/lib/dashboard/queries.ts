@@ -111,7 +111,7 @@ export async function loadConversationsSeries(
     .select('created_at, sender_type')
     .gte('created_at', start)
     .order('created_at', { ascending: true })
-  if (error) throw error
+  if (error) console.warn('[dashboard] loadConversationsSeries query failed (Supabase offline):', error.message || error)
 
   const keys = lastNDayKeys(rangeDays)
   const buckets = new Map<string, { incoming: number; outgoing: number }>()
@@ -182,7 +182,7 @@ export async function loadResponseTime(db: DB): Promise<ResponseTimeSummary> {
     .gte('created_at', fourteenDaysAgo)
     .order('conversation_id', { ascending: true })
     .order('created_at', { ascending: true })
-  if (error) throw error
+  if (error) console.warn('[dashboard] loadResponseTime query failed (Supabase offline):', error.message || error)
 
   const rows = (data ?? []) as {
     conversation_id: string

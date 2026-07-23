@@ -70,7 +70,7 @@ export function WhatsAppConfig() {
         .maybeSingle();
 
       if (error) {
-        console.error('Failed to load config row:', error);
+        console.warn('Config row not loaded (Supabase offline):', error.message || error);
       }
 
       if (data) {

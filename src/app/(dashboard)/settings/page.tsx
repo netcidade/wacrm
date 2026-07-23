@@ -37,10 +37,9 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
+        <h1 className="text-2xl font-bold text-white">Configurações</h1>
         <p className="text-sm text-slate-400 mt-1">
-          Manage your profile, WhatsApp® integration, message templates, and
-          tags.
+          Gerencie seu perfil, integração com WhatsApp®, modelos de mensagem e etiquetas (tags).
         </p>
       </div>
 
@@ -51,28 +50,28 @@ export default function SettingsPage() {
             className="data-active:bg-slate-800 data-active:text-violet-400 text-slate-400"
           >
             <User className="size-4" />
-            Profile
+            Perfil
           </TabsTrigger>
           <TabsTrigger
             value="whatsapp"
             className="data-active:bg-slate-800 data-active:text-violet-400 text-slate-400"
           >
             <Settings className="size-4" />
-            WhatsApp Config
+            WhatsApp
           </TabsTrigger>
           <TabsTrigger
             value="templates"
             className="data-active:bg-slate-800 data-active:text-violet-400 text-slate-400"
           >
             <MessageSquare className="size-4" />
-            Templates
+            Modelos (Templates)
           </TabsTrigger>
           <TabsTrigger
             value="tags"
             className="data-active:bg-slate-800 data-active:text-violet-400 text-slate-400"
           >
             <Tag className="size-4" />
-            Tags
+            Etiquetas (Tags)
           </TabsTrigger>
         </TabsList>
 

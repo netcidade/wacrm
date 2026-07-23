@@ -53,11 +53,10 @@ export function SessionsCard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <LogOut className="size-4 text-violet-400" />
-            Active sessions
+            Sessões Ativas
           </CardTitle>
           <CardDescription className="text-slate-400">
-            Sign out of every device where you&apos;re logged in — including
-            this one. Useful if you lost a laptop or shared your password.
+            Encerre a sessão em todos os dispositivos onde sua conta está conectada — incluindo este. Útil se você perdeu um dispositivo ou deseja revogar o acesso.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -65,21 +64,20 @@ export function SessionsCard() {
             type="button"
             variant="outline"
             onClick={() => setOpen(true)}
+            className="border-slate-700 text-slate-300 hover:bg-slate-800"
           >
             <LogOut className="size-4" />
-            Sign out of all devices
+            Sair de todos os dispositivos
           </Button>
         </CardContent>
       </Card>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="bg-slate-900 border-slate-700">
           <DialogHeader>
-            <DialogTitle>Sign out everywhere?</DialogTitle>
-            <DialogDescription>
-              Every device logged into this account will be signed out and
-              will need to log in again. You will be redirected to the login
-              page.
+            <DialogTitle className="text-white">Sair de todos os dispositivos?</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Todos os dispositivos conectados a esta conta serão desconectados e precisarão realizar o login novamente. Você será redirecionado para a tela de login.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -88,17 +86,23 @@ export function SessionsCard() {
               variant="ghost"
               onClick={() => setOpen(false)}
               disabled={signingOut}
+              className="text-slate-300 hover:bg-slate-800"
             >
-              Cancel
+              Cancelar
             </Button>
-            <Button type="button" onClick={onConfirm} disabled={signingOut}>
+            <Button
+              type="button"
+              onClick={onConfirm}
+              disabled={signingOut}
+              className="bg-violet-600 hover:bg-violet-700 text-white"
+            >
               {signingOut ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Signing out…
+                  Saindo…
                 </>
               ) : (
-                'Sign out everywhere'
+                'Sair de todos'
               )}
             </Button>
           </DialogFooter>

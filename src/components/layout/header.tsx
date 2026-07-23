@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { LogOut, Menu, Settings as SettingsIcon, User } from "lucide-react";
+import { LogOut, Menu, Settings as SettingsIcon, User, HelpCircle } from "lucide-react";
 import {
   Avatar,
   AvatarFallback,
@@ -18,13 +18,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const pageTitles: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/inbox": "Inbox",
-  "/contacts": "Contacts",
-  "/pipelines": "Pipelines",
-  "/broadcasts": "Broadcasts",
-  "/automations": "Automations",
-  "/settings": "Settings",
+  "/dashboard": "Painel de Controle",
+  "/inbox": "Caixa de Entrada",
+  "/contacts": "Contatos",
+  "/pipelines": "Funil de Vendas",
+  "/broadcasts": "Disparos em Massa",
+  "/automations": "Automações No-Code",
+  "/settings": "Configurações",
+  "/help": "Central de Ajuda",
 };
 
 function getPageTitle(pathname: string): string {
@@ -32,7 +33,7 @@ function getPageTitle(pathname: string): string {
   const match = Object.entries(pageTitles).find(([path]) =>
     pathname.startsWith(path),
   );
-  return match ? match[1] : "Dashboard";
+  return match ? match[1] : "Painel de Controle";
 }
 
 interface HeaderProps {
@@ -111,7 +112,7 @@ export function Header({ onOpenSidebar }: HeaderProps) {
             }
           >
             <User className="size-4" />
-            Profile
+            Meu Perfil
           </DropdownMenuItem>
           <DropdownMenuItem
             render={
@@ -122,7 +123,18 @@ export function Header({ onOpenSidebar }: HeaderProps) {
             }
           >
             <SettingsIcon className="size-4" />
-            Settings
+            Configurações
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            render={
+              <Link
+                href="/help"
+                className="text-slate-200 focus:bg-slate-800 focus:text-white"
+              />
+            }
+          >
+            <HelpCircle className="size-4" />
+            Central de Ajuda
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-slate-800" />
           <DropdownMenuItem
@@ -130,7 +142,7 @@ export function Header({ onOpenSidebar }: HeaderProps) {
             className="text-slate-200 focus:bg-slate-800 focus:text-white"
           >
             <LogOut className="size-4" />
-            Sign out
+            Sair da Conta
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
