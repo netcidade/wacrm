@@ -1,3 +1,5 @@
+import { ENV } from '@/lib/config/env'
+
 /**
  * Verify the HMAC-SHA256 signature Meta attaches to webhook POSTs.
  * Uses Web Crypto API (crypto.subtle) — 100% compatible with Edge Runtime & Node.js.
@@ -6,7 +8,7 @@ export async function verifyMetaWebhookSignature(
   rawBody: string,
   signatureHeader: string | null,
 ): Promise<boolean> {
-  const secret = process.env.META_APP_SECRET
+  const secret = ENV.META_APP_SECRET || ''
   if (!secret) {
     console.error(
       '[webhook] META_APP_SECRET is not set — rejecting request. ' +

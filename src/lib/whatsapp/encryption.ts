@@ -1,3 +1,5 @@
+import { ENV } from '@/lib/config/env'
+
 /**
  * WhatsApp token encryption using Web Crypto API (AES-GCM / AES-CBC).
  * 100% compatible with Edge Runtime, Cloudflare Workers, and Node.js.
@@ -33,7 +35,7 @@ async function getAesKey(keyHex: string, algoName: 'AES-GCM' | 'AES-CBC'): Promi
 }
 
 export async function encrypt(text: string): Promise<string> {
-  const encryptionKey = process.env.ENCRYPTION_KEY!
+  const encryptionKey = ENV.ENCRYPTION_KEY
   const iv = crypto.getRandomValues(new Uint8Array(GCM_IV_LENGTH))
   const key = await getAesKey(encryptionKey, 'AES-GCM')
   const encoder = new TextEncoder()
@@ -53,7 +55,7 @@ export async function encrypt(text: string): Promise<string> {
 }
 
 export async function decrypt(encryptedText: string): Promise<string> {
-  const encryptionKey = process.env.ENCRYPTION_KEY!
+  const encryptionKey = ENV.ENCRYPTION_KEY
   const parts = encryptedText.split(':')
 
   if (parts.length === 3) {
