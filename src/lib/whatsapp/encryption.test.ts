@@ -18,84 +18,82 @@ function cbcEncryptLegacy(plaintext: string): string {
 
 describe("encryption", () => {
   describe("encrypt / decrypt round-trip", () => {
-    it("recovers the original plaintext", () => {
-      const ct = encrypt("EAAG... fake WhatsApp token");
-      expect(decrypt(ct)).toBe("EAAG... fake WhatsApp token");
+    it("recovers the original plaintext", async () => {
+      const ct = await encrypt("EAAG... fake WhatsApp token");
+      expect(await decrypt(ct)).toBe("EAAG... fake WhatsApp token");
     });
 
-    it("produces three colon-separated parts (GCM)", () => {
-      const ct = encrypt("anything");
+    it("produces three colon-separated parts (GCM)", async () => {
+      const ct = await encrypt("anything");
       expect(ct.split(":")).toHaveLength(3);
     });
 
-    it("uses a fresh IV per encrypt so identical plaintexts produce different ciphertexts", () => {
-      const a = encrypt("same input");
-      const b = encrypt("same input");
+    it("uses a fresh IV per encrypt so identical plaintexts produce different ciphertexts", async () => {
+      const a = await encrypt("same input");
+      const b = await encrypt("same input");
       expect(a).not.toBe(b);
-      expect(decrypt(a)).toBe("same input");
-      expect(decrypt(b)).toBe("same input");
+      expect(await decrypt(a)).toBe("same input");
+      expect(await decrypt(b)).toBe("same input");
     });
 
-    it("roundtrips empty string", () => {
-      const ct = encrypt("");
-      expect(decrypt(ct)).toBe("");
+    it("roundtrips empty string", async () => {
+      const ct = await encrypt("");
+      expect(await decrypt(ct)).toBe("");
     });
 
-    it("roundtrips multibyte UTF-8", () => {
-      const ct = encrypt("token-✓-🔐-žąsis");
-      expect(decrypt(ct)).toBe("token-✓-🔐-žąsis");
+    it("roundtrips multibyte UTF-8", async () => {
+      const ct = await encrypt("token-✓-🔐-žąsis");
+      expect(await decrypt(ct)).toBe("token-✓-🔐-žąsis");
     });
   });
 
   describe("GCM authentication", () => {
-    it("rejects ciphertext tampered after encryption", () => {
-      const ct = encrypt("secret");
+    it("rejects ciphertext tampered after encryption", async () => {
+      const ct = await encrypt("secret");
       const [ivHex, ctHex, tagHex] = ct.split(":");
-      // Flip a byte in the ciphertext body — auth tag will mismatch.
       const tamperedCtHex =
         (parseInt(ctHex.slice(0, 2), 16) ^ 0xff).toString(16).padStart(2, "0") +
         ctHex.slice(2);
-      expect(() =>
+      await expect(
         decrypt(`${ivHex}:${tamperedCtHex}:${tagHex}`),
-      ).toThrow();
+      ).rejects.toThrow();
     });
 
-    it("rejects a swapped auth tag", () => {
-      const ct = encrypt("secret");
+    it("rejects a swapped auth tag", async () => {
+      const ct = await encrypt("secret");
       const [ivHex, ctHex] = ct.split(":");
       const bogusTag = "00".repeat(16);
-      expect(() => decrypt(`${ivHex}:${ctHex}:${bogusTag}`)).toThrow();
+      await expect(decrypt(`${ivHex}:${ctHex}:${bogusTag}`)).rejects.toThrow();
     });
 
-    it("rejects a GCM IV of the wrong length", () => {
-      const ct = encrypt("secret");
+    it("rejects a GCM IV of the wrong length", async () => {
+      const ct = await encrypt("secret");
       const [, ctHex, tagHex] = ct.split(":");
-      const shortIv = "00".repeat(8); // 8 bytes ≠ 12
-      expect(() => decrypt(`${shortIv}:${ctHex}:${tagHex}`)).toThrow(
+      const shortIv = "00".repeat(8);
+      await expect(decrypt(`${shortIv}:${ctHex}:${tagHex}`)).rejects.toThrow(
         /GCM IV length/,
       );
     });
 
-    it("rejects a GCM auth tag of the wrong length", () => {
-      const ct = encrypt("secret");
+    it("rejects a GCM auth tag of the wrong length", async () => {
+      const ct = await encrypt("secret");
       const [ivHex, ctHex] = ct.split(":");
-      const shortTag = "00".repeat(8); // 8 bytes ≠ 16
-      expect(() => decrypt(`${ivHex}:${ctHex}:${shortTag}`)).toThrow(
+      const shortTag = "00".repeat(8);
+      await expect(decrypt(`${ivHex}:${ctHex}:${shortTag}`)).rejects.toThrow(
         /auth-tag length/,
       );
     });
   });
 
   describe("legacy CBC compatibility (read-only)", () => {
-    it("decrypts a CBC blob produced by the previous codepath", () => {
+    it("decrypts a CBC blob produced by the previous codepath", async () => {
       const legacy = cbcEncryptLegacy("old-token");
-      expect(decrypt(legacy)).toBe("old-token");
+      expect(await decrypt(legacy)).toBe("old-token");
     });
 
-    it("rejects a CBC blob with the wrong IV length", () => {
-      // 8-byte IV (16 hex chars) instead of 16 bytes.
+    it("rejects a CBC blob with the wrong IV length", async () => {
       const bogus = "00".repeat(8) + ":" + "00".repeat(16);
-      expect(() => decrypt(bogus)).toThrow(/CBC IV length/);
+      await expect(decrypt(bogus)).rejects.toThrow(/CBC IV length/);
     });
   });
 
@@ -105,21 +103,21 @@ describe("encryption", () => {
       expect(isLegacyFormat(legacy)).toBe(true);
     });
 
-    it("isLegacyFormat returns false for three-part GCM strings", () => {
-      const modern = encrypt("anything");
+    it("isLegacyFormat returns false for three-part GCM strings", async () => {
+      const modern = await encrypt("anything");
       expect(isLegacyFormat(modern)).toBe(false);
     });
   });
 
   describe("malformed input", () => {
-    it("throws on a single-token blob (no colons)", () => {
-      expect(() => decrypt("not-encrypted-at-all")).toThrow(
+    it("throws on a single-token blob (no colons)", async () => {
+      await expect(decrypt("not-encrypted-at-all")).rejects.toThrow(
         /unrecognised format/,
       );
     });
 
-    it("throws on a four-part blob", () => {
-      expect(() => decrypt("aa:bb:cc:dd")).toThrow(/unrecognised format/);
+    it("throws on a four-part blob", async () => {
+      await expect(decrypt("aa:bb:cc:dd")).rejects.toThrow(/unrecognised format/);
     });
   });
 });

@@ -1,12 +1,11 @@
-import crypto from 'node:crypto'
-
 /**
  * Verify the HMAC-SHA256 signature Meta attaches to webhook POSTs.
+ * Uses Web Crypto API (crypto.subtle) — 100% compatible with Edge Runtime & Node.js.
  */
-export function verifyMetaWebhookSignature(
+export async function verifyMetaWebhookSignature(
   rawBody: string,
   signatureHeader: string | null,
-): boolean {
+): Promise<boolean> {
   const secret = process.env.META_APP_SECRET
   if (!secret) {
     console.error(
@@ -17,15 +16,32 @@ export function verifyMetaWebhookSignature(
     return false
   }
 
-  if (!signatureHeader) return false
-  if (!signatureHeader.startsWith('sha256=')) return false
+  if (!signatureHeader || !signatureHeader.startsWith('sha256=')) return false
 
-  const expected =
-    'sha256=' +
-    crypto.createHmac('sha256', secret).update(rawBody).digest('hex')
+  try {
+    const encoder = new TextEncoder()
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(secret) as unknown as BufferSource,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    )
+    const signatureBuffer = await crypto.subtle.sign(
+      'HMAC',
+      key,
+      encoder.encode(rawBody) as unknown as BufferSource
+    )
 
-  const a = Buffer.from(signatureHeader)
-  const b = Buffer.from(expected)
-  if (a.length !== b.length) return false
-  return crypto.timingSafeEqual(a, b)
+    const expectedHex =
+      'sha256=' +
+      Array.from(new Uint8Array(signatureBuffer))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+
+    return signatureHeader === expectedHex
+  } catch (err) {
+    console.error('[webhook] Signature verification error:', err)
+    return false
+  }
 }

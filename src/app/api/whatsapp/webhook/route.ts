@@ -99,7 +99,7 @@ export async function GET(request: Request) {
     for (const config of configs) {
       if (!config.verify_token) continue
       try {
-        if (decrypt(config.verify_token) === verifyToken) {
+        if ((await decrypt(config.verify_token)) === verifyToken) {
           matchedConfig = config
           break
         }
@@ -112,18 +112,20 @@ export async function GET(request: Request) {
       // Fire-and-forget GCM upgrade. Safe to run on every subscribe
       // since it's a no-op once the column is already GCM.
       if (isLegacyFormat(matchedConfig.verify_token)) {
-        void supabaseAdmin()
-          .from('whatsapp_config')
-          .update({ verify_token: encrypt(verifyToken) })
-          .eq('id', matchedConfig.id)
-          .then(({ error }: { error: unknown }) => {
-            if (error) {
-              console.warn(
-                '[webhook] verify_token GCM upgrade failed:',
-                (error as { message?: string })?.message ?? error,
-              )
-            }
-          })
+        encrypt(verifyToken).then((enc) => {
+          void supabaseAdmin()
+            .from('whatsapp_config')
+            .update({ verify_token: enc })
+            .eq('id', matchedConfig.id)
+            .then(({ error }: { error: unknown }) => {
+              if (error) {
+                console.warn(
+                  '[webhook] verify_token GCM upgrade failed:',
+                  (error as { message?: string })?.message ?? error,
+                )
+              }
+            })
+        })
       }
       // Return challenge as plain text
       return new Response(challenge, {
@@ -152,7 +154,7 @@ export async function POST(request: Request) {
   const rawBody = await request.text()
   const signature = request.headers.get('x-hub-signature-256')
 
-  if (!verifyMetaWebhookSignature(rawBody, signature)) {
+  if (!(await verifyMetaWebhookSignature(rawBody, signature))) {
     // 401 (not 200) — we want Meta's delivery dashboard to show failures
     // loudly if a misconfiguration causes signatures to stop matching,
     // rather than silently eating events.
@@ -206,7 +208,7 @@ async function processWebhook(body: { entry?: WhatsAppWebhookEntry[] }) {
         continue
       }
 
-      const decryptedAccessToken = decrypt(config.access_token)
+      const decryptedAccessToken = await decrypt(config.access_token)
 
       for (let i = 0; i < value.messages.length; i++) {
         const message = value.messages[i]

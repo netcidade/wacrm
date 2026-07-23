@@ -117,7 +117,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const accessToken = decrypt(config.access_token)
+    const accessToken = await decrypt(config.access_token)
 
     // Self-heal legacy CBC-encrypted tokens. Fire-and-forget: we
     // return from the send without waiting, so a failed upgrade just
@@ -125,18 +125,20 @@ export async function POST(request: Request) {
     // concurrent sends both produce valid GCM ciphertexts of the same
     // plaintext, last write wins.
     if (isLegacyFormat(config.access_token)) {
-      void supabase
-        .from('whatsapp_config')
-        .update({ access_token: encrypt(accessToken) })
-        .eq('id', config.id)
-        .then(({ error }) => {
-          if (error) {
-            console.warn(
-              '[whatsapp/send] access_token GCM upgrade failed:',
-              error.message,
-            )
-          }
-        })
+      encrypt(accessToken).then((enc) => {
+        void supabase
+          .from('whatsapp_config')
+          .update({ access_token: enc })
+          .eq('id', config.id)
+          .then(({ error }) => {
+            if (error) {
+              console.warn(
+                '[whatsapp/send] access_token GCM upgrade failed:',
+                error.message,
+              )
+            }
+          })
+      })
     }
 
     // Resolve the reply target (if any) to its Meta message_id, which is
