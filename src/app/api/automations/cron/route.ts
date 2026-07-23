@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 
-export const runtime = 'edge'
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { resumePendingExecution } from '@/lib/automations/engine'
 import type { AutomationContext } from '@/lib/automations/engine'

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 
-export const runtime = 'edge'
 import { createClient } from '@/lib/supabase/server'
 import { verifyPhoneNumber } from '@/lib/whatsapp/meta-api'
 import { encrypt, decrypt } from '@/lib/whatsapp/encryption'

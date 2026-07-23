@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 
-export const runtime = 'edge'
 import { createClient } from '@supabase/supabase-js'
 import { decrypt, encrypt, isLegacyFormat } from '@/lib/whatsapp/encryption'
 import { getMediaUrl, downloadMedia } from '@/lib/whatsapp/meta-api'
